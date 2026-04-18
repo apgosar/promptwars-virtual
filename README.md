@@ -44,7 +44,7 @@
 
 1. **Clone the repository**:
    ```bash
-   git clone [repo-url]
+   git clone https://github.com/apgosar/promptwars-virtual.git
    ```
 2. **Install dependencies**:
    ```bash
