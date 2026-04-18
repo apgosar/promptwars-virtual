@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { GoogleMap, useLoadScript, Marker, InfoWindow } from '@react-google-maps/api';
 import type { Stadium, Gate, Amenity } from '../../types';
+import { defaultOptions, darkMapStyle, highContrastStyle } from '../../utils/mapStyles';
 
 interface VenueMapProps {
   stadium: Stadium;
@@ -14,50 +15,7 @@ const mapContainerStyle = {
   borderRadius: '20px'
 };
 
-const defaultOptions = {
-  disableDefaultUI: true,
-  zoomControl: true,
-  mapTypeControl: false,
-  streetViewControl: false,
-  fullscreenControl: true,
-};
 
-// Dark theme map style
-const darkMapStyle = [
-  { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
-  {
-    featureType: 'administrative.locality',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#d59563' }]
-  },
-  {
-    featureType: 'road',
-    elementType: 'geometry',
-    stylers: [{ color: '#38414e' }]
-  },
-  {
-    featureType: 'road',
-    elementType: 'geometry.stroke',
-    stylers: [{ color: '#212a37' }]
-  },
-  {
-    featureType: 'water',
-    elementType: 'geometry',
-    stylers: [{ color: '#17263c' }]
-  }
-];
-
-// High contrast map style
-const highContrastStyle = [
-  { elementType: 'geometry', stylers: [{ color: '#000000' }] },
-  { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#ffffff' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#000000', weight: 2 }] },
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#ffffff' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#000000' }] },
-];
 
 /**
  * VenueMap component displaying the stadium layout, gates, and amenities.

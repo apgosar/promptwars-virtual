@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { Stadium } from '../../types';
 import { Bot, Send, User } from 'lucide-react';
+import { useGemini } from '../../hooks/useGemini';
 
 interface AssistantProps {
   stadium: Stadium;
-}
-
-interface Message {
-  role: 'user' | 'assistant';
-  text: string;
 }
 
 /**
@@ -19,46 +14,16 @@ interface Message {
  */
 export const Assistant: React.FC<AssistantProps> = ({ stadium }) => {
   const [query, setQuery] = useState('');
-  const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', text: `Welcome to **${stadium.name}**! How can I help you today?` }
-  ]);
-  const [loading, setLoading] = useState(false);
+  const { messages, loading, sendMessage } = useGemini(`Welcome to **${stadium.name}**! How can I help you today?`);
 
   /**
-   * Sends user query to Gemini and handles the response.
+   * Handles passing the input to the Gemini hook.
    */
   const handleSend = async () => {
     if (!query.trim()) return;
-
-    const userMessage = query.trim();
-    setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
-    setQuery('');
-    setLoading(true);
-
-    try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      if (!apiKey) {
-        throw new Error('Gemini API key not configured.');
-      }
-
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
-      const context = `You are an intelligent venue assistant for ${stadium.name}.
-      The stadium has the following amenities: ${stadium.amenities.map(a => `${a.name} (wait time: ${a.wait_time_mins} mins)`).join(', ')}.
-      The stadium has the following gates: ${stadium.gates.map(g => `${g.name} serving sections ${g.closestSections.join(', ')}`).join(', ')}.
-      Keep your responses concise, helpful, and tailored to the venue context. Use markdown for lists and bold text.`;
-
-      const result = await model.generateContent(`${context}\n\nUser: ${userMessage}`);
-      const text = result.response.text();
-
-      setMessages(prev => [...prev, { role: 'assistant', text }]);
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      setMessages(prev => [...prev, { role: 'assistant', text: `Sorry, I encountered an error: ${errorMessage}` }]);
-    } finally {
-      setLoading(false);
-    }
+    const currentQuery = query;
+    setQuery(''); // Clear early for better UX
+    await sendMessage(currentQuery, stadium);
   };
 
   return (

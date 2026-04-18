@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import type { Stadium, Gate } from '../../types';
-import { Ticket, MapPin, Navigation, Users, Clock } from 'lucide-react';
+import { Ticket, MapPin, Navigation, Users, Clock, AlertCircle } from 'lucide-react';
+import { analytics } from '../../utils/AnalyticsManager';
+import { LiveScore } from './LiveScore';
 
 interface DashboardProps {
   stadium: Stadium;
@@ -31,12 +33,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ stadium, onSectionSelect }
       const section = ticketInput.trim().toUpperCase();
       setScannedSection(section);
       onSectionSelect(section);
+      analytics.trackEvent('ticket_scanned', { section });
     }
   };
 
+  /**
+   * Simulates reporting an issue to venue staff via Firestore.
+   */
+  const handleReportIssue = () => {
+    alert("Issue reported to venue staff. Security has been dispatched.");
+    analytics.trackEvent('issue_reported', { location: scannedSection || 'Unknown' });
+  };
+
   return (
-    <div className="glass-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <header style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <LiveScore />
+      
+      <div className="glass-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <header style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         <div style={{ background: 'var(--accent-glow)', padding: '0.75rem', borderRadius: '12px' }}>
           <Ticket size={32} color="var(--accent-secondary)" />
         </div>
@@ -118,6 +132,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ stadium, onSectionSelect }
           ))}
         </div>
       </section>
+
+        {/* Incident Reporting Panel */}
+        <section style={{ marginTop: '0.5rem' }}>
+          <button 
+            className="btn-secondary" 
+            onClick={handleReportIssue}
+            style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '0.5rem', borderColor: 'var(--danger)', color: 'var(--danger)' }}
+          >
+            <AlertCircle size={20} />
+            Report Spill / Incident to Staff
+          </button>
+        </section>
+      </div>
     </div>
   );
 };

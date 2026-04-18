@@ -1,5 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { NotificationToast } from './components/NotificationToast';
 import { AccessibilityManager } from './utils/AccessibilityManager';
 import { analytics } from './utils/AnalyticsManager';
 import stadiumData from './data/stadiums.json';
@@ -55,6 +56,7 @@ function App() {
 
   return (
     <div className="app-container">
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       <header role="banner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <MapIcon size={36} color="var(--accent-primary)" aria-hidden="true" />
@@ -97,7 +99,7 @@ function App() {
         </div>
       </header>
 
-      <main role="main" style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2rem' }}>
+      <main id="main-content" role="main" tabIndex={-1} style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2rem', outline: 'none' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           <Suspense fallback={<div className="loading-shimmer" style={{ height: '300px', borderRadius: 'var(--radius-lg)' }} />}>
             <Dashboard 
@@ -146,6 +148,8 @@ function App() {
            </section>
         </aside>
       </main>
+
+      <NotificationToast message="Heavy congestion reported near Gate 1. Please consider using Gate 2 if available." />
     </div>
   );
 }
