@@ -59,6 +59,10 @@ const highContrastStyle = [
   { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#000000' }] },
 ];
 
+/**
+ * VenueMap component displaying the stadium layout, gates, and amenities.
+ * Integrated with Google Maps for real-time-like navigation feedback.
+ */
 export const VenueMap: React.FC<VenueMapProps> = ({ stadium, highContrast, highlightedSection }) => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
@@ -66,21 +70,24 @@ export const VenueMap: React.FC<VenueMapProps> = ({ stadium, highContrast, highl
 
   const [activeMarker, setActiveMarker] = React.useState<Gate | Amenity | null>(null);
 
+  /**
+   * Memoized map options for theme switching (Dark vs High Contrast).
+   */
   const options = useMemo(() => ({
     ...defaultOptions,
     styles: highContrast ? highContrastStyle : darkMapStyle
   }), [highContrast]);
 
   if (loadError) {
-    return <div className="glass-card" style={{ padding: '2rem', textAlign: 'center' }}>Error loading maps. Please check API Key.</div>;
+    return <div className="glass-card" style={{ padding: '2rem', textAlign: 'center', color: 'var(--danger)' }}>Error loading maps. Please check connection or API Key.</div>;
   }
 
   if (!isLoaded) {
-    return <div className="glass-card" style={{ padding: '2rem', textAlign: 'center' }}>Loading interactive map...</div>;
+    return <div className="glass-card" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>Loading interactive map...</div>;
   }
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: 'relative' }} role="region" aria-label="Interactive venue map">
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         zoom={stadium.zoom}
@@ -95,6 +102,7 @@ export const VenueMap: React.FC<VenueMapProps> = ({ stadium, highContrast, highl
             icon={{
               url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
             }}
+            title={gate.name}
           />
         ))}
 
@@ -106,6 +114,7 @@ export const VenueMap: React.FC<VenueMapProps> = ({ stadium, highContrast, highl
              icon={{
               url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png'
             }}
+            title={amenity.name}
           />
         ))}
 
@@ -114,12 +123,12 @@ export const VenueMap: React.FC<VenueMapProps> = ({ stadium, highContrast, highl
             position={{ lat: activeMarker.lat, lng: activeMarker.lng }}
             onCloseClick={() => setActiveMarker(null)}
           >
-            <div style={{ color: '#000' }}>
-              <h3>{activeMarker.name}</h3>
+            <div style={{ color: '#000', padding: '0.25rem' }}>
+              <h3 style={{ fontSize: '1rem', marginBottom: '0.25rem' }}>{activeMarker.name}</h3>
               {'type' in activeMarker ? (
-                <p>Wait time: {activeMarker.wait_time_mins} mins</p>
+                <p style={{ margin: 0, fontSize: '0.875rem' }}>Wait time: <strong>{activeMarker.wait_time_mins} mins</strong></p>
               ) : (
-                <p>Closest sections: {activeMarker.closestSections.join(', ')}</p>
+                <p style={{ margin: 0, fontSize: '0.875rem' }}>Closest sections: {activeMarker.closestSections.join(', ')}</p>
               )}
             </div>
           </InfoWindow>
@@ -127,18 +136,22 @@ export const VenueMap: React.FC<VenueMapProps> = ({ stadium, highContrast, highl
       </GoogleMap>
       
       {highlightedSection && (
-        <div style={{
-          position: 'absolute',
-          top: 10,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: 'var(--accent-primary)',
-          color: 'white',
-          padding: '8px 16px',
-          borderRadius: '20px',
-          fontWeight: 'bold',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
-        }}>
+        <div 
+          aria-live="assertive"
+          style={{
+            position: 'absolute',
+            top: 10,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'var(--accent-primary)',
+            color: 'white',
+            padding: '8px 16px',
+            borderRadius: '20px',
+            fontWeight: 'bold',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+            zIndex: 1
+          }}
+        >
           Directing to section: {highlightedSection}
         </div>
       )}

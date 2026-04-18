@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { Stadium } from '../../types';
 import { Bot, Send, User } from 'lucide-react';
@@ -7,13 +8,25 @@ interface AssistantProps {
   stadium: Stadium;
 }
 
+interface Message {
+  role: 'user' | 'assistant';
+  text: string;
+}
+
+/**
+ * AI Assistant component providing venue-specific information using Gemini AI.
+ * Enhanced with accessibility features and Markdown rendering.
+ */
 export const Assistant: React.FC<AssistantProps> = ({ stadium }) => {
   const [query, setQuery] = useState('');
-  const [messages, setMessages] = useState<{role: 'user' | 'assistant', text: string}[]>([
-    { role: 'assistant', text: `Welcome to ${stadium.name}! How can I help you today?` }
+  const [messages, setMessages] = useState<Message[]>([
+    { role: 'assistant', text: `Welcome to **${stadium.name}**! How can I help you today?` }
   ]);
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Sends user query to Gemini and handles the response.
+   */
   const handleSend = async () => {
     if (!query.trim()) return;
 
@@ -34,14 +47,15 @@ export const Assistant: React.FC<AssistantProps> = ({ stadium }) => {
       const context = `You are an intelligent venue assistant for ${stadium.name}.
       The stadium has the following amenities: ${stadium.amenities.map(a => `${a.name} (wait time: ${a.wait_time_mins} mins)`).join(', ')}.
       The stadium has the following gates: ${stadium.gates.map(g => `${g.name} serving sections ${g.closestSections.join(', ')}`).join(', ')}.
-      Keep your responses concise, helpful, and tailored to the venue context.`;
+      Keep your responses concise, helpful, and tailored to the venue context. Use markdown for lists and bold text.`;
 
       const result = await model.generateContent(`${context}\n\nUser: ${userMessage}`);
       const text = result.response.text();
 
       setMessages(prev => [...prev, { role: 'assistant', text }]);
-    } catch (error: any) {
-      setMessages(prev => [...prev, { role: 'assistant', text: `Sorry, I encountered an error: ${error.message}` }]);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      setMessages(prev => [...prev, { role: 'assistant', text: `Sorry, I encountered an error: ${errorMessage}` }]);
     } finally {
       setLoading(false);
     }
@@ -54,7 +68,11 @@ export const Assistant: React.FC<AssistantProps> = ({ stadium }) => {
         AI Concierge
       </h3>
       
-      <div style={{ flex: 1, overflowY: 'auto', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem', paddingRight: '0.5rem' }}>
+      <div 
+        role="log"
+        aria-live="polite"
+        style={{ flex: 1, overflowY: 'auto', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem', paddingRight: '0.5rem' }}
+      >
         {messages.map((msg, idx) => (
           <div key={idx} style={{
             display: 'flex',
@@ -70,8 +88,11 @@ export const Assistant: React.FC<AssistantProps> = ({ stadium }) => {
               borderRadius: '12px',
               borderTopRightRadius: msg.role === 'user' ? 0 : '12px',
               borderTopLeftRadius: msg.role === 'assistant' ? 0 : '12px',
+              color: 'var(--text-primary)',
+              fontSize: '0.875rem',
+              lineHeight: '1.4'
             }}>
-              {msg.text}
+              <ReactMarkdown>{msg.text}</ReactMarkdown>
             </div>
             {msg.role === 'user' && <div style={{ background: 'var(--glass-border)', padding: '0.5rem', borderRadius: '50%' }}><User size={16} /></div>}
           </div>
