@@ -17,6 +17,21 @@ export default defineConfig({
       port: 5173
     }
   },
+  build: {
+    target: 'esnext',
+    minify: 'esbuild',
+    cssCodeSplit: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-utils': ['lucide-react', '@google/generative-ai'],
+          'vendor-maps': ['@react-google-maps/api']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
+  },
   test: {
     globals: true,
     environment: 'jsdom',

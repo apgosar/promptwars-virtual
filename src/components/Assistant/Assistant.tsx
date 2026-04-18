@@ -80,7 +80,9 @@ export const Assistant: React.FC<AssistantProps> = ({ stadium }) => {
       </div>
 
       <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <label htmlFor="chat-input" className="sr-only">Ask a question to the AI concierge</label>
         <input
+          id="chat-input"
           type="text"
           className="custom-input"
           value={query}
@@ -88,7 +90,13 @@ export const Assistant: React.FC<AssistantProps> = ({ stadium }) => {
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           placeholder="Ask about gates, food..."
         />
-        <button className="btn-primary" onClick={handleSend} disabled={loading} style={{ padding: '0.75rem' }}>
+        <button 
+          className="btn-primary" 
+          onClick={handleSend} 
+          disabled={loading} 
+          style={{ padding: '0.75rem' }}
+          aria-label="Send message"
+        >
           <Send size={20} />
         </button>
       </div>

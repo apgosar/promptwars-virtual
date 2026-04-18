@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { VenueMap } from './components/Map/VenueMap';
-import { Dashboard } from './components/Dashboard/Dashboard';
-import { Assistant } from './components/Assistant/Assistant';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
+// Lazy load heavy components
+const VenueMap = lazy(() => import('./components/Map/VenueMap').then(module => ({ default: module.VenueMap })));
+const Dashboard = lazy(() => import('./components/Dashboard/Dashboard').then(module => ({ default: module.Dashboard })));
+const Assistant = lazy(() => import('./components/Assistant/Assistant').then(module => ({ default: module.Assistant })));
 import { AccessibilityManager } from './utils/AccessibilityManager';
 import stadiumData from './data/stadiums.json';
 import type { Stadium } from './types';
@@ -41,7 +42,7 @@ function App() {
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <select 
             className="custom-input" 
-            style={{ width: 'auto', background: 'var(--glass-bg)' }}
+            aria-label="Select stadium venue"            style={{ width: 'auto', background: 'var(--glass-bg)' }}
             value={selectedStadium.id}
             onChange={(e) => {
               const stadium = stadiums.find(s => s.id === e.target.value);
@@ -59,6 +60,7 @@ function App() {
           <button 
             className="btn-secondary" 
             onClick={toggleHighContrast}
+            aria-label="Toggle High Contrast Mode"
             title="Toggle High Contrast Mode"
             style={{ 
               borderColor: highContrast ? 'var(--accent-primary)' : 'var(--glass-border)',
@@ -72,21 +74,26 @@ function App() {
 
       <main style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2rem' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          <Dashboard 
-            stadium={selectedStadium} 
-            onSectionSelect={setHighlightedSection} 
-          />
-          <div className="glass-card" style={{ padding: '1rem' }}>
-            <VenueMap 
-              stadium={selectedStadium} 
-              highContrast={highContrast} 
-              highlightedSection={highlightedSection} 
-            />
-          </div>
+
+            <Suspense fallback={<div className="loading-shimmer" style={{ height: '300px', borderRadius: 'var(--radius-lg)' }} />}>
+              <Dashboard 
+                stadium={selectedStadium} 
+                onSectionSelect={setHighlightedSection} 
+              />
+              <div className="glass-card" style={{ padding: '1rem', marginTop: '2rem' }}>
+                <VenueMap 
+                  stadium={selectedStadium} 
+                  highContrast={highContrast} 
+                  highlightedSection={highlightedSection} 
+                />
+              </div>
+            </Suspense>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-           <Assistant stadium={selectedStadium} />
+           <Suspense fallback={<div className="loading-shimmer" style={{ height: '400px', borderRadius: 'var(--radius-lg)' }} />}>
+             <Assistant stadium={selectedStadium} />
+           </Suspense>
            
            <div className="glass-card" style={{ padding: '1.5rem' }}>
               <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>

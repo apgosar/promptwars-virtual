@@ -37,7 +37,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ stadium, onSectionSelect }
       </div>
 
       <div style={{ display: 'flex', gap: '1rem' }}>
+        <label htmlFor="ticket-input" className="sr-only">Enter your section (e.g. VIP, A1)</label>
         <input 
+          id="ticket-input"
           type="text" 
           className="custom-input" 
           placeholder="e.g. VIP, A1, C3" 
