@@ -1,0 +1,7 @@
+.gcloudignore
+.git
+.gitignore
+node_modules
+dist
+# .env is deliberately NOT ignored here so it can be used during build
+# but it IS ignored in .gitignore so it's not in git.

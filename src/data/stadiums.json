@@ -1,0 +1,32 @@
+{
+  "stadiums": [
+    {
+      "id": "generic_large",
+      "name": "Global Arena",
+      "location": { "lat": 40.7128, "lng": -74.0060 },
+      "zoom": 17,
+      "gates": [
+        { "id": "G1", "name": "North Gate", "lat": 40.7135, "lng": -74.0060, "closestSections": ["A1", "A2", "A3"] },
+        { "id": "G2", "name": "South Gate", "lat": 40.7121, "lng": -74.0060, "closestSections": ["C1", "C2", "C3"] }
+      ],
+      "amenities": [
+        { "id": "F1", "type": "food", "name": "Burger Stand", "lat": 40.7130, "lng": -74.0055, "wait_time_mins": 5 },
+        { "id": "R1", "type": "restroom", "name": "East Restroom", "lat": 40.7128, "lng": -74.0050, "wait_time_mins": 2 }
+      ]
+    },
+    {
+      "id": "nmd_stadium",
+      "name": "Narendra Modi Stadium",
+      "location": { "lat": 23.0917, "lng": 72.5971 },
+      "zoom": 17,
+      "gates": [
+        { "id": "G1", "name": "Gate 1 (Main)", "lat": 23.0925, "lng": 72.5971, "closestSections": ["A", "B", "C"] },
+        { "id": "G2", "name": "Gate 2 (VIP)", "lat": 23.0910, "lng": 72.5980, "closestSections": ["VIP", "Boxes"] }
+      ],
+      "amenities": [
+        { "id": "F1", "type": "food", "name": "Pavilion Snacks", "lat": 23.0917, "lng": 72.5960, "wait_time_mins": 8 },
+        { "id": "R1", "type": "restroom", "name": "North Restrooms", "lat": 23.0922, "lng": 72.5965, "wait_time_mins": 1 }
+      ]
+    }
+  ]
+}
